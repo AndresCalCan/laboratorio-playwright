@@ -1,14 +1,14 @@
 # Laboratorio de Automatización de Pruebas con Playwright y TypeScript
 
 ## 👤 Datos del Estudiante
-- **Nombre:** [Tu Nombre Aquí]
-- **Asignatura:** Ingeniería de Software III
-- **Docente:** Ing. John Alexander Pardo González
-- **Herramientas:** Playwright, TypeScript, Node.js, Visual Studio Code, Git/GitHub
+- Nombre: andres calderon
+- Asignatura: Ingeniería de Software III
+- Docente: Ing. John Alexander Pardo González
+- Herramientas: Playwright, TypeScript, Node.js, Visual Studio Code, Git/GitHub
 
 ---
 
-## 1. 📖 Contexto del Proyecto
+ 1. 📖 Contexto del Proyecto
 En este proyecto se implementaron pruebas automatizadas de interfaz gráfica (E2E) aplicando los conceptos trabajados en clase hasta la organización de pruebas:
 - Configuración del entorno de automatización con Playwright y TypeScript.
 - Localizadores semánticos recomendados (`getByRole`, `getByLabel`, `locator`).
