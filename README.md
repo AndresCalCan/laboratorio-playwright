@@ -72,8 +72,8 @@ Para el desarrollo del taller se utilizó la plataforma de pruebas **[The Intern
 - Tener instalado **Node.js** (versión 18 o superior).
 - Clonar este repositorio en tu equipo:
   ```bash
-  git clone <URL_DEL_REPOSITORIO>
-  cd laboratorio-playwright
+  git clone https://github.com/AndresCalCan/laboratorio-playwright.git
+cd laboratorio-playwright
   ```
 
 ### Instalación de dependencias
