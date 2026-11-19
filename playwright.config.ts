@@ -8,9 +8,10 @@ export default defineConfig({
     ['html', { open: 'never' }]
   ],
   use: {
-    baseURL: 'https://www.saucedemo.com',
+    baseURL: 'https://es.wikipedia.org',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    viewport: { width: 1280, height: 800 },
   },
   projects: [
     {

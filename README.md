@@ -9,60 +9,59 @@
 ---
 
 ## 1. 📖 Contexto del Proyecto
-En este laboratorio se diseñó e implementó un conjunto integral de **pruebas automatizadas de interfaz gráfica (End-to-End - E2E)** aplicando las mejores prácticas de la industria y los lineamientos vistos en clase:
+En este laboratorio se diseñó e implementó un conjunto completo de **pruebas automatizadas de interfaz gráfica (End-to-End - E2E)** aplicando las mejores prácticas de la ingeniería de software y la calidad de software:
 
-- **Framework de pruebas:** Playwright configurado con TypeScript para tipado estático y robustez.
-- **Selectores semánticos y de prueba:** Uso de atributos dedicados de testing (`data-test`, `getByRole`, selectores contextuales y de texto).
-- **Estructuración y modularización:** Organización por suites temáticas (`test.describe`), precondiciones desacopladas (`test.beforeEach`) y aserciones web explícitas (`toHaveURL`, `toBeVisible`, `toHaveText`, `toContainText`, `toHaveCount`).
-- **Validaciones de lógica de negocio:** Control de acceso, decremento/incremento reactivo de contadores en el carrito, verificación algorítmica de ordenamiento por precio y cálculo de totales en checkout.
-- **Generación automática de evidencias:** Capturas de pantalla (`screenshots`) almacenadas por caso de prueba y reportería en formato HTML.
+- **Framework de pruebas:** Playwright configurado con TypeScript para tipado estático, modularidad y mantenibilidad.
+- **Selectores semánticos y de accesibilidad:** Localizadores precisos (`page.locator`, `getByRole`, selectores de atributos semánticos e interlenguaje).
+- **Estructuración y modularización:** Suites organizadas por Historias de Usuario (`test.describe`), precondiciones desacopladas (`test.beforeEach`) y aserciones web explícitas (`toHaveURL`, `toHaveText`, `toContainText`, `toBeVisible`, `toHaveTitle`).
+- **Casos de prueba variados:** Pruebas de búsqueda directa, sugerencias dinámicas en vivo (autocompletado reactivo), manejo de búsquedas sin resultados (casos negativos/borde), internacionalización (cambio de idiomas entre Español, Inglés y Alemán), navegación por anclajes de tabla de contenidos e inspección de historial de revisiones.
+- **Generación automática de evidencias:** Capturas de pantalla (`screenshots`) generadas al finalizar cada prueba en la carpeta `evidencias/` y reportería en formato HTML.
 
 ---
 
-## 2. 🌐 Aplicación Seleccionada: SauceDemo (Swag Labs)
-Para este proyecto se seleccionó la plataforma **[SauceDemo (Swag Labs)](https://www.saucedemo.com/)**, desarrollada por **Sauce Labs**.
+## 2. 🌐 Aplicación Seleccionada: Wikipedia (La Enciclopedia Libre)
+Para este taller se seleccionó la plataforma oficial **[Wikipedia en Español](https://es.wikipedia.org/)** (`https://es.wikipedia.org/`).
 
 ### ¿Por qué esta plataforma?
-1. **Estándar de la Industria y Ámbito Académico:** Es la aplicación de referencia global utilizada en cursos universitarios de Ingeniería de Software, certificaciones QA (ISTQB, Selenium Conf) y pruebas técnicas profesionales para automatización web.
-2. **Flujo de Negocio Completo (E-commerce real):** A diferencia de simples formularios estáticos, simula un ciclo comercial completo: inicio de sesión multi-rol, catálogo dinámico de productos, filtros de ordenamiento, persistencia en carrito de compras y checkout transaccional en múltiples pasos.
-3. **Manejo de Casos de Borde y Excepciones:** Cuenta con usuarios con comportamientos preconfigurados (usuario estándar, usuario bloqueado/suspendido, validaciones de campos requeridos), permitiendo cubrir tanto flujos felices (*happy paths*) como caminos alternos y de error.
-4. **Alta Estabilidad y Confiabilidad:** Posee atributos semánticos estables (`data-test`), sin interferencia de CAPTCHAs aleatorios ni bloqueos anti-bot que introduzcan *flakiness* (inestabilidad) en las pruebas automatizadas.
+1. **Reconocimiento Universal:** Es una de las plataformas web más consultadas, respetadas y conocidas a nivel mundial, lo que permite al docente y a cualquier evaluador reconocer inmediatamente el flujo y el comportamiento esperado.
+2. **Estabilidad y Disponibilidad Real:** A diferencia de páginas de retail comercial cerradas (que emplean bloqueadores agresivos tipo Akamai o Cloudflare Turnstile con captchas intermitentes que rompen la integración continua), Wikipedia cuenta con una infraestructura pública de alto rendimiento (MediaWiki / Vector 2022) que permite ejecutar suites de pruebas determinísticas y confiables.
+3. **Contenido Rico y Multilingüe:** Permite evaluar funcionalidades avanzadas como internacionalización real (interwikis enlazando versiones en inglés y alemán), sugerencias de autocompletado en tiempo real, tablas de contenido dinámicas e historial de revisiones colaborativas.
 
 ---
 
 ## 3. 📝 Historias de Usuario
 
-### HU-01: Autenticación y Control de Acceso
-> **Como** usuario del portal SauceDemo  
-> **Quiero** autenticarme mediante usuario y contraseña  
-> **Para** acceder a las funcionalidades del catálogo y asegurar el cierre de sesión adecuado.
+### HU-01: Búsqueda y Localización de Artículos
+> **Como** usuario y estudiante consultor de Wikipedia  
+> **Quiero** buscar artículos temáticos y de marcas reconocidas mediante la barra de búsqueda  
+> **Para** acceder rápidamente a la información requerida y validar sugerencias de autocompletado.
 
-- **Criterio 1 (Login exitoso):** Ingresando credenciales válidas (`standard_user`), el sistema redirige a `/inventory.html`, visualizando el catálogo de productos.
-- **Criterio 2 (Usuario bloqueado):** Ingresando el usuario `locked_out_user`, el sistema impide el acceso y muestra la alerta `"Epic sadface: Sorry, this user has been locked out."`.
-- **Criterio 3 (Contraseña errónea):** Con clave inválida, se presenta el mensaje `"Epic sadface: Username and password do not match any user in this service"`.
-- **Criterio 4 (Campos obligatorios vacíos):** Al enviar el formulario sin diligenciar campos, se muestra `"Epic sadface: Username is required"`.
-- **Criterio 5 (Logout seguro):** Desde el menú lateral hamburguesa, al hacer clic en "Logout", se finaliza la sesión y se retorna a la pantalla principal.
-
----
-
-### HU-02: Gestión de Catálogo y Carrito de Compras
-> **Como** cliente de la tienda  
-> **Quiero** explorar los artículos, ordenarlos por precio y gestionar el carrito  
-> **Para** seleccionar los productos deseados antes de la compra.
-
-- **Criterio 1 (Agregar al carrito):** Al presionar "Add to cart" en un producto, el botón conmuta a "Remove" y la insignia numérica del carrito incrementa su valor.
-- **Criterio 2 (Remover del carrito):** Al pulsar "Remove", el botón regresa a "Add to cart" y la insignia del carrito disminuye de forma reactiva.
-- **Criterio 3 (Ordenamiento por precio):** Al aplicar el filtro `Price (low to high)`, los productos se reorganizan de forma estrictamente ascendente por su valor monetario.
+- **Criterio 1 (Búsqueda de marca reconocida - Adidas):** Al buscar "Adidas", el sistema redirige a `/wiki/Adidas`, mostrando el título principal y la ficha técnica corporativa (*Infobox*) con datos de fundación.
+- **Criterio 2 (Búsqueda académica - Ingeniería de software):** Al buscar "Ingeniería de software", el sistema redirige al artículo correspondiente, desplegando el primer párrafo introductorio y la tabla de contenidos estructurada.
+- **Criterio 3 (Búsqueda sin resultados / Término inexistente):** Al ingresar una cadena sin coincidencias (`xyzqwerty987654321`), el sistema presenta la pantalla informativa `"No hay resultados que cumplan los criterios de búsqueda"`.
+- **Criterio 4 (Sugerencias reactivas de autocompletado):** Al ingresar parcialmente una palabra clave ("Adida") sin presionar Enter, el componente de menú flotante despliega sugerencias en vivo con la coincidencia "Adidas".
 
 ---
 
-### HU-03: Proceso de Compra y Checkout End-to-End
-> **Como** comprador en el sitio  
-> **Quiero** completar el formulario de compra con mis datos de despacho y confirmar el pedido  
-> **Para** recibir mis productos satisfactoriamente.
+### HU-02: Internacionalización y Multilingüismo (I18n)
+> **Como** lector internacional  
+> **Quiero** alternar el idioma de lectura de un artículo a sus versiones en otros idiomas  
+> **Para** consultar la información en la lengua oficial correspondiente.
 
-- **Criterio 1 (Checkout exitoso):** Al avanzar desde el carrito, ingresar los datos de envío (Nombre, Apellido, Código Postal), revisar el desglose de precios (Subtotal, Tax, Total) y finalizar, el sistema emite la confirmación `"Thank you for your order!"` y `"Your order has been dispatched"`.
-- **Criterio 2 (Validación de datos obligatorios):** Si se omite el código postal en el checkout, el sistema retiene el avance e informa `"Error: Postal Code is required"`.
+- **Criterio 1 (Cambio a versión en Inglés):** Desde el artículo de Adidas en español, al consultar el enlace interidioma a inglés (`en`), se navega exitosamente a `https://en.wikipedia.org/wiki/Adidas` verificando el encabezado en inglés.
+- **Criterio 2 (Cambio a versión en Alemán):** Desde el artículo de Adidas en español, al consultar el enlace interidioma al alemán (`de` - país de origen), se navega a `https://de.wikipedia.org/wiki/Adidas`.
+
+---
+
+### HU-03: Navegación Estructural, Historial y Portada
+> **Como** usuario habitual de Wikipedia  
+> **Quiero** explorar la portada, navegar a artículos aleatorios, revisar el índice y consultar el historial  
+> **Para** auditar la trazabilidad de ediciones y acceder ágilmente a distintas secciones.
+
+- **Criterio 1 (Exploración de la Portada oficial):** Al ingresar a `/wiki/Wikipedia:Portada`, se verifica la presencia del logotipo institucional (`.mw-logo`), el título oficial y el saludo de bienvenida.
+- **Criterio 2 (Navegación a artículo aleatorio):** Al solicitar `Especial:Aleatoria`, el sistema redirige automáticamente a un artículo existente con título y cuerpo de texto válidos.
+- **Criterio 3 (Historial de revisiones):** Al acceder a la pestaña "Ver historial" del artículo de Adidas, se visualiza el registro de ediciones cronológicas con al menos 10 registros históricos, usuarios y fechas.
+- **Criterio 4 (Tabla de Contenidos interactiva - TOC):** En el artículo de "Ingeniería de software", al interactuar con un enlace del índice lateral, la URL se actualiza con el ancla de la sección seleccionada.
 
 ---
 
@@ -70,57 +69,57 @@ Para este proyecto se seleccionó la plataforma **[SauceDemo (Swag Labs)](https:
 
 | ID | HU | Nombre del Caso de Prueba | Datos de Entrada | Resultado Esperado | Estado |
 |:---:|:---:|---|---|---|:---:|
-| **CP-01** | HU-01 | Login exitoso con credenciales estándar | `standard_user` / `secret_sauce` | Redirección a `/inventory.html` con 6 productos | ✅ Pasó |
-| **CP-02** | HU-01 | Login bloqueado con usuario suspendido | `locked_out_user` / `secret_sauce` | Alerta de usuario bloqueado visible en pantalla | ✅ Pasó |
-| **CP-03** | HU-01 | Login fallido con contraseña incorrecta | `standard_user` / `PasswordErroneo123!` | Alerta de credenciales que no coinciden | ✅ Pasó |
-| **CP-04** | HU-01 | Login fallido con campos obligatorios vacíos | Clic en Login sin datos | Alerta "Username is required" | ✅ Pasó |
-| **CP-05** | HU-01 | Cierre de sesión (Logout) desde menú lateral | Clic en botón "Logout" tras login | Regresa a `/` y muestra formulario de login | ✅ Pasó |
-| **CP-06** | HU-02 | Agregar productos y verificar contador | Clic en agregar Backpack y Bike Light | Botones en estado "Remove" e insignia en `2` | ✅ Pasó |
-| **CP-07** | HU-02 | Remover producto y verificar decremento | Remover Bike Light con 2 items previos | Insignia decrece a `1` y botón vuelve a "Add to cart" | ✅ Pasó |
-| **CP-08** | HU-02 | Ordenar productos por precio (menor a mayor) | Filtro `lohi` seleccionado | Precios ordenados ascendentemente ($7.99 a $49.99) | ✅ Pasó |
-| **CP-09** | HU-03 | Compra completa End-to-End exitosa | Producto en carrito + datos de cliente | Pantalla final con "Thank you for your order!" | ✅ Pasó |
-| **CP-10** | HU-03 | Validación de campos obligatorios en Checkout | Nombre y Apellido sin Postal Code | Mensaje "Error: Postal Code is required" | ✅ Pasó |
+| **CP-01** | HU-01 | Búsqueda directa del artículo Adidas con infobox | `"Adidas"` en el buscador principal | Redirección a `/wiki/Adidas`, encabezado "Adidas" e infobox visible | ✅ Pasó |
+| **CP-02** | HU-01 | Búsqueda de artículo temático Ingeniería de software | `"Ingeniería de software"` | Redirección a `/wiki/Ingenier%C3%ADa_de_software` con tabla de contenidos | ✅ Pasó |
+| **CP-03** | HU-01 | Manejo de búsqueda sin resultados con término inexistente | `"xyzqwerty987654321"` | Alerta "No hay resultados que cumplan los criterios de búsqueda" | ✅ Pasó |
+| **CP-04** | HU-01 | Despliegue interactivo de sugerencias de autocompletado | Texto parcial `"Adida"` | Menú flotante visible con sugerencia de "Adidas" | ✅ Pasó |
+| **CP-05** | HU-02 | Cambio de idioma del artículo Adidas a Inglés (English) | Enlace interidioma `hreflang="en"` | Redirección a `en.wikipedia.org/wiki/Adidas` | ✅ Pasó |
+| **CP-06** | HU-02 | Cambio de idioma del artículo Adidas a Alemán (Deutsch) | Enlace interidioma `hreflang="de"` | Redirección a `de.wikipedia.org/wiki/Adidas` | ✅ Pasó |
+| **CP-07** | HU-03 | Elementos principales de la Portada oficial de Wikipedia | Navegación a `/wiki/Wikipedia:Portada` | Logotipo oficial visible y saludo institucional presente | ✅ Pasó |
+| **CP-08** | HU-03 | Navegación a artículo aleatorio (Especial:Aleatoria) | Navegación a `/wiki/Especial:Aleatoria` | Redirección a un artículo con título y párrafos de texto | ✅ Pasó |
+| **CP-09** | HU-03 | Consulta del historial de revisiones y versiones | Clic en pestaña "Ver historial" (`#ca-history`) | Pantalla con título "Historial de «Adidas»" y $\ge 10$ revisiones | ✅ Pasó |
+| **CP-10** | HU-03 | Navegación mediante la Tabla de Contenidos (TOC) | Clic en sección del índice lateral | URL actualizada con el ancla `#...` de la sección | ✅ Pasó |
 
 ---
 
 ## 5. 📸 Evidencias de Ejecución
 
-### Módulo HU-01: Autenticación y Control de Acceso
-#### CP-01: Login exitoso
-![Evidencia CP-01](evidencias/CP-01-login-exitoso.png)
+### Módulo HU-01: Búsqueda y Localización de Artículos
+#### CP-01: Búsqueda directa del artículo Adidas
+![Evidencia CP-01](evidencias/CP-01-busqueda-adidas.png)
 
-#### CP-02: Usuario bloqueado (locked_out_user)
-![Evidencia CP-02](evidencias/CP-02-usuario-bloqueado.png)
+#### CP-02: Búsqueda de artículo Ingeniería de software
+![Evidencia CP-02](evidencias/CP-02-busqueda-ingenieria-software.png)
 
-#### CP-03: Contraseña incorrecta
-![Evidencia CP-03](evidencias/CP-03-password-invalido.png)
+#### CP-03: Manejo de búsqueda sin resultados
+![Evidencia CP-03](evidencias/CP-03-busqueda-sin-resultados.png)
 
-#### CP-04: Campos obligatorios vacíos
-![Evidencia CP-04](evidencias/CP-04-campos-vacios.png)
-
-#### CP-05: Logout exitoso
-![Evidencia CP-05](evidencias/CP-05-logout-exitoso.png)
+#### CP-04: Sugerencias de autocompletado en vivo
+![Evidencia CP-04](evidencias/CP-04-sugerencias-en-vivo.png)
 
 ---
 
-### Módulo HU-02: Gestión de Catálogo y Carrito
-#### CP-06: Agregar productos al carrito
-![Evidencia CP-06](evidencias/CP-06-agregar-carrito.png)
+### Módulo HU-02: Internacionalización y Multilingüismo (I18n)
+#### CP-05: Versión en Inglés (English)
+![Evidencia CP-05](evidencias/CP-05-idioma-ingles.png)
 
-#### CP-07: Remover producto del carrito
-![Evidencia CP-07](evidencias/CP-07-remover-carrito.png)
-
-#### CP-08: Ordenamiento por precio (Low to High)
-![Evidencia CP-08](evidencias/CP-08-ordenar-precio.png)
+#### CP-06: Versión en Alemán (Deutsch)
+![Evidencia CP-06](evidencias/CP-06-idioma-aleman.png)
 
 ---
 
-### Módulo HU-03: Proceso de Compra y Checkout E2E
-#### CP-09: Compra completa E2E confirmada
-![Evidencia CP-09](evidencias/CP-09-compra-exitosa.png)
+### Módulo HU-03: Navegación Estructural, Historial y Portada
+#### CP-07: Portada oficial de Wikipedia en español
+![Evidencia CP-07](evidencias/CP-07-portada-wikipedia.png)
 
-#### CP-10: Validación de formulario de Checkout (Postal Code requerido)
-![Evidencia CP-10](evidencias/CP-10-checkout-campos-requeridos.png)
+#### CP-08: Artículo aleatorio
+![Evidencia CP-08](evidencias/CP-08-articulo-aleatorio.png)
+
+#### CP-09: Historial de revisiones de artículo
+![Evidencia CP-09](evidencias/CP-09-historial-revisiones.png)
+
+#### CP-10: Tabla de contenidos interactiva (TOC)
+![Evidencia CP-10](evidencias/CP-10-tabla-contenidos.png)
 
 ---
 
@@ -129,20 +128,20 @@ Para este proyecto se seleccionó la plataforma **[SauceDemo (Swag Labs)](https:
 ```text
 laboratorio-playwright/
 ├── evidencias/                  # Capturas de pantalla generadas automáticamente
-│   ├── CP-01-login-exitoso.png
-│   ├── CP-02-usuario-bloqueado.png
-│   ├── CP-03-password-invalido.png
-│   ├── CP-04-campos-vacios.png
-│   ├── CP-05-logout-exitoso.png
-│   ├── CP-06-agregar-carrito.png
-│   ├── CP-07-remover-carrito.png
-│   ├── CP-08-ordenar-precio.png
-│   ├── CP-09-compra-exitosa.png
-│   └── CP-10-checkout-campos-requeridos.png
+│   ├── CP-01-busqueda-adidas.png
+│   ├── CP-02-busqueda-ingenieria-software.png
+│   ├── CP-03-busqueda-sin-resultados.png
+│   ├── CP-04-sugerencias-en-vivo.png
+│   ├── CP-05-idioma-ingles.png
+│   ├── CP-06-idioma-aleman.png
+│   ├── CP-07-portada-wikipedia.png
+│   ├── CP-08-articulo-aleatorio.png
+│   ├── CP-09-historial-revisiones.png
+│   └── CP-10-tabla-contenidos.png
 ├── tests/                       # Especificaciones de prueba automatizadas
-│   ├── auth.spec.ts             # Pruebas de autenticación y sesión (HU-01)
-│   ├── cart.spec.ts             # Pruebas de catálogo, filtros y carrito (HU-02)
-│   └── checkout.spec.ts         # Pruebas del flujo de compra E2E (HU-03)
+│   ├── 01-search.spec.ts        # Búsqueda, coincidencia y autocompletado (HU-01)
+│   ├── 02-languages.spec.ts     # Internacionalización y cambio de idioma (HU-02)
+│   └── 03-navigation.spec.ts    # Portada, artículo aleatorio, historial y TOC (HU-03)
 ├── package.json                 # Metadatos del proyecto y scripts de ejecución
 ├── playwright.config.ts         # Configuración central de Playwright (Chromium, baseURL, reportes)
 └── README.md                    # Documentación académica del laboratorio
