@@ -1,79 +1,163 @@
-# Laboratorio de Automatización de Pruebas con Playwright y TypeScript
+# Laboratorio de Automatización de Pruebas E2E con Playwright y TypeScript
 
 ## 👤 Datos del Estudiante
-- Nombre: andres calderon
-- Asignatura: Ingeniería de Software III
-- Docente: Ing. John Alexander Pardo González
-- Herramientas: Playwright, TypeScript, Node.js, Visual Studio Code, Git/GitHub
+- **Nombre:** andres calderon
+- **Asignatura:** Ingeniería de Software III
+- **Docente:** Ing. John Alexander Pardo González
+- **Herramientas:** Playwright, TypeScript, Node.js, Visual Studio Code, Git/GitHub
 
 ---
 
- 1. 📖 Contexto del Proyecto
-En este proyecto se implementaron pruebas automatizadas de interfaz gráfica (E2E) aplicando los conceptos trabajados en clase hasta la organización de pruebas:
-- Configuración del entorno de automatización con Playwright y TypeScript.
-- Localizadores semánticos recomendados (`getByRole`, `getByLabel`, `locator`).
-- Organización de pruebas mediante `test.describe` y precondiciones con `test.beforeEach`.
-- Aserciones web automáticas (`toHaveURL`, `toContainText`, `toBeVisible`).
-- Captura de evidencias visuales (screenshots) al finalizar cada caso de prueba.
+## 1. 📖 Contexto del Proyecto
+En este laboratorio se diseñó e implementó un conjunto integral de **pruebas automatizadas de interfaz gráfica (End-to-End - E2E)** aplicando las mejores prácticas de la industria y los lineamientos vistos en clase:
+
+- **Framework de pruebas:** Playwright configurado con TypeScript para tipado estático y robustez.
+- **Selectores semánticos y de prueba:** Uso de atributos dedicados de testing (`data-test`, `getByRole`, selectores contextuales y de texto).
+- **Estructuración y modularización:** Organización por suites temáticas (`test.describe`), precondiciones desacopladas (`test.beforeEach`) y aserciones web explícitas (`toHaveURL`, `toBeVisible`, `toHaveText`, `toContainText`, `toHaveCount`).
+- **Validaciones de lógica de negocio:** Control de acceso, decremento/incremento reactivo de contadores en el carrito, verificación algorítmica de ordenamiento por precio y cálculo de totales en checkout.
+- **Generación automática de evidencias:** Capturas de pantalla (`screenshots`) almacenadas por caso de prueba y reportería en formato HTML.
 
 ---
 
-## 2. 🌐 Aplicación Seleccionada
-Para el desarrollo del taller se utilizó la plataforma de pruebas **[The Internet (Herokuapp) - Form Authentication](https://the-internet.herokuapp.com/login)**.
-- **Razón de elección:** Es una aplicación pública diseñada para testing que cuenta con formularios de autenticación estables, respuestas visuales claras (mensajes de éxito y error con alertas dinámicas) y no posee bloqueos antibot ni captchas.
+## 2. 🌐 Aplicación Seleccionada: SauceDemo (Swag Labs)
+Para este proyecto se seleccionó la plataforma **[SauceDemo (Swag Labs)](https://www.saucedemo.com/)**, desarrollada por **Sauce Labs**.
+
+### ¿Por qué esta plataforma?
+1. **Estándar de la Industria y Ámbito Académico:** Es la aplicación de referencia global utilizada en cursos universitarios de Ingeniería de Software, certificaciones QA (ISTQB, Selenium Conf) y pruebas técnicas profesionales para automatización web.
+2. **Flujo de Negocio Completo (E-commerce real):** A diferencia de simples formularios estáticos, simula un ciclo comercial completo: inicio de sesión multi-rol, catálogo dinámico de productos, filtros de ordenamiento, persistencia en carrito de compras y checkout transaccional en múltiples pasos.
+3. **Manejo de Casos de Borde y Excepciones:** Cuenta con usuarios con comportamientos preconfigurados (usuario estándar, usuario bloqueado/suspendido, validaciones de campos requeridos), permitiendo cubrir tanto flujos felices (*happy paths*) como caminos alternos y de error.
+4. **Alta Estabilidad y Confiabilidad:** Posee atributos semánticos estables (`data-test`), sin interferencia de CAPTCHAs aleatorios ni bloqueos anti-bot que introduzcan *flakiness* (inestabilidad) en las pruebas automatizadas.
 
 ---
 
 ## 3. 📝 Historias de Usuario
 
-### HU-01: Autenticación y Cierre de Sesión en el Portal
-> **Como** usuario registrado del sistema  
-> **Quiero** ingresar mis credenciales en el formulario de inicio de sesión  
-> **Para** acceder de forma segura a mi área personal y poder cerrar sesión cuando lo requiera.  
+### HU-01: Autenticación y Control de Acceso
+> **Como** usuario del portal SauceDemo  
+> **Quiero** autenticarme mediante usuario y contraseña  
+> **Para** acceder a las funcionalidades del catálogo y asegurar el cierre de sesión adecuado.
 
-**Criterios de Aceptación:**
-- **Escenario 1 (Login exitoso):** Dado que estoy en la página de login, cuando ingreso usuario y contraseña correctos, entonces el sistema me redirige a la zona segura (`/secure`) y muestra un mensaje de bienvenida.
-- **Escenario 2 (Contraseña errónea):** Dado que estoy en la página de login, cuando ingreso un usuario válido pero una contraseña equivocada, entonces el sistema me mantiene en `/login` y muestra un mensaje de advertencia "Your password is invalid!".
-- **Escenario 3 (Usuario no registrado):** Dado que estoy en la página de login, cuando ingreso un nombre de usuario que no existe, entonces el sistema me mantiene en `/login` y muestra un mensaje de advertencia "Your username is invalid!".
-- **Escenario 4 (Cierre de sesión):** Dado que inicié sesión exitosamente, cuando hago clic en el botón "Logout", entonces el sistema me redirige de nuevo a `/login` y muestra un mensaje confirmando el cierre de sesión.
+- **Criterio 1 (Login exitoso):** Ingresando credenciales válidas (`standard_user`), el sistema redirige a `/inventory.html`, visualizando el catálogo de productos.
+- **Criterio 2 (Usuario bloqueado):** Ingresando el usuario `locked_out_user`, el sistema impide el acceso y muestra la alerta `"Epic sadface: Sorry, this user has been locked out."`.
+- **Criterio 3 (Contraseña errónea):** Con clave inválida, se presenta el mensaje `"Epic sadface: Username and password do not match any user in this service"`.
+- **Criterio 4 (Campos obligatorios vacíos):** Al enviar el formulario sin diligenciar campos, se muestra `"Epic sadface: Username is required"`.
+- **Criterio 5 (Logout seguro):** Desde el menú lateral hamburguesa, al hacer clic en "Logout", se finaliza la sesión y se retorna a la pantalla principal.
+
+---
+
+### HU-02: Gestión de Catálogo y Carrito de Compras
+> **Como** cliente de la tienda  
+> **Quiero** explorar los artículos, ordenarlos por precio y gestionar el carrito  
+> **Para** seleccionar los productos deseados antes de la compra.
+
+- **Criterio 1 (Agregar al carrito):** Al presionar "Add to cart" en un producto, el botón conmuta a "Remove" y la insignia numérica del carrito incrementa su valor.
+- **Criterio 2 (Remover del carrito):** Al pulsar "Remove", el botón regresa a "Add to cart" y la insignia del carrito disminuye de forma reactiva.
+- **Criterio 3 (Ordenamiento por precio):** Al aplicar el filtro `Price (low to high)`, los productos se reorganizan de forma estrictamente ascendente por su valor monetario.
+
+---
+
+### HU-03: Proceso de Compra y Checkout End-to-End
+> **Como** comprador en el sitio  
+> **Quiero** completar el formulario de compra con mis datos de despacho y confirmar el pedido  
+> **Para** recibir mis productos satisfactoriamente.
+
+- **Criterio 1 (Checkout exitoso):** Al avanzar desde el carrito, ingresar los datos de envío (Nombre, Apellido, Código Postal), revisar el desglose de precios (Subtotal, Tax, Total) y finalizar, el sistema emite la confirmación `"Thank you for your order!"` y `"Your order has been dispatched"`.
+- **Criterio 2 (Validación de datos obligatorios):** Si se omite el código postal en el checkout, el sistema retiene el avance e informa `"Error: Postal Code is required"`.
 
 ---
 
 ## 4. 🧪 Matriz de Casos de Prueba
 
-| ID | HU | Nombre del Caso | Datos de Entrada | Resultado Esperado | Estado |
-|---|---|---|---|---|:---:|
-| **CP-01** | HU-01 | Login exitoso con credenciales correctas | `tomsmith` / `SuperSecretPassword!` | Redirige a `/secure` y muestra alerta de éxito | ✅ Pasó |
-| **CP-02** | HU-01 | Login fallido con contraseña incorrecta | `tomsmith` / `PasswordIncorrecta123` | Permanece en `/login` y muestra "Your password is invalid!" | ✅ Pasó |
-| **CP-03** | HU-01 | Login fallido con usuario no registrado | `usuario_falso` / `SuperSecretPassword!` | Permanece en `/login` y muestra "Your username is invalid!" | ✅ Pasó |
-| **CP-04** | HU-01 | Cerrar sesión (Logout) correctamente | Clic en botón "Logout" tras login | Redirige a `/login` y confirma cierre de sesión | ✅ Pasó |
+| ID | HU | Nombre del Caso de Prueba | Datos de Entrada | Resultado Esperado | Estado |
+|:---:|:---:|---|---|---|:---:|
+| **CP-01** | HU-01 | Login exitoso con credenciales estándar | `standard_user` / `secret_sauce` | Redirección a `/inventory.html` con 6 productos | ✅ Pasó |
+| **CP-02** | HU-01 | Login bloqueado con usuario suspendido | `locked_out_user` / `secret_sauce` | Alerta de usuario bloqueado visible en pantalla | ✅ Pasó |
+| **CP-03** | HU-01 | Login fallido con contraseña incorrecta | `standard_user` / `PasswordErroneo123!` | Alerta de credenciales que no coinciden | ✅ Pasó |
+| **CP-04** | HU-01 | Login fallido con campos obligatorios vacíos | Clic en Login sin datos | Alerta "Username is required" | ✅ Pasó |
+| **CP-05** | HU-01 | Cierre de sesión (Logout) desde menú lateral | Clic en botón "Logout" tras login | Regresa a `/` y muestra formulario de login | ✅ Pasó |
+| **CP-06** | HU-02 | Agregar productos y verificar contador | Clic en agregar Backpack y Bike Light | Botones en estado "Remove" e insignia en `2` | ✅ Pasó |
+| **CP-07** | HU-02 | Remover producto y verificar decremento | Remover Bike Light con 2 items previos | Insignia decrece a `1` y botón vuelve a "Add to cart" | ✅ Pasó |
+| **CP-08** | HU-02 | Ordenar productos por precio (menor a mayor) | Filtro `lohi` seleccionado | Precios ordenados ascendentemente ($7.99 a $49.99) | ✅ Pasó |
+| **CP-09** | HU-03 | Compra completa End-to-End exitosa | Producto en carrito + datos de cliente | Pantalla final con "Thank you for your order!" | ✅ Pasó |
+| **CP-10** | HU-03 | Validación de campos obligatorios en Checkout | Nombre y Apellido sin Postal Code | Mensaje "Error: Postal Code is required" | ✅ Pasó |
 
 ---
 
 ## 5. 📸 Evidencias de Ejecución
 
-### CP-01: Login exitoso
+### Módulo HU-01: Autenticación y Control de Acceso
+#### CP-01: Login exitoso
 ![Evidencia CP-01](evidencias/CP-01-login-exitoso.png)
 
-### CP-02: Login fallido - Contraseña incorrecta
-![Evidencia CP-02](evidencias/CP-02-password-invalido.png)
+#### CP-02: Usuario bloqueado (locked_out_user)
+![Evidencia CP-02](evidencias/CP-02-usuario-bloqueado.png)
 
-### CP-03: Login fallido - Usuario no registrado
-![Evidencia CP-03](evidencias/CP-03-usuario-invalido.png)
+#### CP-03: Contraseña incorrecta
+![Evidencia CP-03](evidencias/CP-03-password-invalido.png)
 
-### CP-04: Cerrar sesión (Logout)
-![Evidencia CP-04](evidencias/CP-04-logout-exitoso.png)
+#### CP-04: Campos obligatorios vacíos
+![Evidencia CP-04](evidencias/CP-04-campos-vacios.png)
+
+#### CP-05: Logout exitoso
+![Evidencia CP-05](evidencias/CP-05-logout-exitoso.png)
 
 ---
 
-## 6. 🚀 Cómo Ejecutar las Pruebas Localmente
+### Módulo HU-02: Gestión de Catálogo y Carrito
+#### CP-06: Agregar productos al carrito
+![Evidencia CP-06](evidencias/CP-06-agregar-carrito.png)
+
+#### CP-07: Remover producto del carrito
+![Evidencia CP-07](evidencias/CP-07-remover-carrito.png)
+
+#### CP-08: Ordenamiento por precio (Low to High)
+![Evidencia CP-08](evidencias/CP-08-ordenar-precio.png)
+
+---
+
+### Módulo HU-03: Proceso de Compra y Checkout E2E
+#### CP-09: Compra completa E2E confirmada
+![Evidencia CP-09](evidencias/CP-09-compra-exitosa.png)
+
+#### CP-10: Validación de formulario de Checkout (Postal Code requerido)
+![Evidencia CP-10](evidencias/CP-10-checkout-campos-requeridos.png)
+
+---
+
+## 6. 📁 Estructura del Proyecto
+
+```text
+laboratorio-playwright/
+├── evidencias/                  # Capturas de pantalla generadas automáticamente
+│   ├── CP-01-login-exitoso.png
+│   ├── CP-02-usuario-bloqueado.png
+│   ├── CP-03-password-invalido.png
+│   ├── CP-04-campos-vacios.png
+│   ├── CP-05-logout-exitoso.png
+│   ├── CP-06-agregar-carrito.png
+│   ├── CP-07-remover-carrito.png
+│   ├── CP-08-ordenar-precio.png
+│   ├── CP-09-compra-exitosa.png
+│   └── CP-10-checkout-campos-requeridos.png
+├── tests/                       # Especificaciones de prueba automatizadas
+│   ├── auth.spec.ts             # Pruebas de autenticación y sesión (HU-01)
+│   ├── cart.spec.ts             # Pruebas de catálogo, filtros y carrito (HU-02)
+│   └── checkout.spec.ts         # Pruebas del flujo de compra E2E (HU-03)
+├── package.json                 # Metadatos del proyecto y scripts de ejecución
+├── playwright.config.ts         # Configuración central de Playwright (Chromium, baseURL, reportes)
+└── README.md                    # Documentación académica del laboratorio
+```
+
+---
+
+## 7. 🚀 Cómo Ejecutar las Pruebas Localmente
 
 ### Prerrequisitos
 - Tener instalado **Node.js** (versión 18 o superior).
-- Clonar este repositorio en tu equipo:
+- Clonar este repositorio:
   ```bash
   git clone https://github.com/AndresCalCan/laboratorio-playwright.git
-cd laboratorio-playwright
+  cd laboratorio-playwright
   ```
 
 ### Instalación de dependencias
@@ -83,36 +167,19 @@ npx playwright install chromium
 ```
 
 ### Comandos de ejecución
-- **Ejecutar todas las pruebas en segundo plano (headless):**
+- **Ejecutar todos los casos de prueba (modo headless):**
   ```bash
-  npx playwright test
+  npm test
   ```
-- **Ejecutar viendo el navegador en tiempo real:**
+- **Ejecutar visualizando el navegador en tiempo real (modo headed):**
   ```bash
-  npx playwright test --headed
+  npm run test:headed
   ```
-- **Ejecutar en modo interactivo (UI Mode):**
+- **Ejecutar en la interfaz interactiva oficial de Playwright:**
   ```bash
-  npx playwright test --ui
+  npm run test:ui
   ```
-- **Ver el reporte HTML generado:**
+- **Consultar el reporte interactivo HTML:**
   ```bash
-  npx playwright show-report
+  npm run test:report
   ```
-
----
-
-## 7. 🛠️ Dificultades Encontradas y Soluciones
-1. **Manejo de selectores en los mensajes de alerta:**  
-   *Dificultad:* El banner de mensaje (`#flash`) contenía espacios adicionales y caracteres de salto de línea generados por el botón de cierre de alerta en el DOM.  
-   *Solución:* Se utilizó `.toContainText('...')` en lugar de una comparación exacta con `.toHaveText('...')`, logrando que la aserción fuera robusta y no fallara por espacios en blanco.
-2. **Independencia de las pruebas:**  
-   *Dificultad:* Si un caso dejaba la sesión abierta, el siguiente caso podía comenzar en una página inesperada.  
-   *Solución:* Se utilizó el hook `test.beforeEach` para que cada prueba comience navegando directamente a `/login`, garantizando aislamiento total entre ejecuciones.
-
----
-
-## 8. 💡 Conclusiones
-- La automatización de pruebas con Playwright reduce drásticamente el tiempo de validación de flujos críticos de usuario (como el login y logout) comparado con la ejecución manual.
-- Organizar las pruebas en bloques `describe` y precondiciones con `beforeEach` facilita la lectura del código y mantiene el principio DRY (Don't Repeat Yourself).
-- Las capturas de pantalla automáticas proporcionan trazabilidad inmediata ante cualquier fallo o como evidencia formal del cumplimiento de criterios de aceptación.

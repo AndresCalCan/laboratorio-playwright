@@ -3,10 +3,14 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
-  reporter: 'html',
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }]
+  ],
   use: {
-    baseURL: 'https://the-internet.herokuapp.com',
+    baseURL: 'https://www.saucedemo.com',
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
   },
   projects: [
     {
